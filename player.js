@@ -14,6 +14,7 @@ class Player {
         this._image.frames = 6           //Indicamos el numero de frames que tiene la imagen
         this._image.framesIndex = 0
         this._framesCounter = framesCounter
+        this._lives = 3
         this.setListeners()
     }
 

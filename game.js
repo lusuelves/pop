@@ -15,6 +15,9 @@ const Game = {
     },
     framesCounter: 0,
     level: 1,
+    score: 1000,
+    lives: undefined,
+    bonus: undefined,
     init: function () {
         this.canvas = document.getElementById("canvas")
         this.ctx = this.canvas.getContext("2d")
@@ -22,16 +25,22 @@ const Game = {
         this.winH = window.innerHeight
         this.canvas.width = this.winW
         this.canvas.height = this.winH
-        //this.components()
     },
     start: function () {
+        this.bubbles = []
         this.components()
+        this.scoreboard = ScoreBoard
+        this.scoreboard.init(this.ctx)
         this.interval = setInterval(() => {
             this.framesCounter++
+            if(this.framesCounter%100==0) this.score--
             this.clearAll()
             this.drawAll()
             this.moveAll()
             this.newBubble()
+            this.newBonus()
+            this.getBonus()
+            console.log(this.player._lives)
             this.clearBullet()
             this.gameOver()
             this.win()
@@ -56,10 +65,13 @@ const Game = {
     drawAll: function () {
         this.background.draw()
         this.player.draw(this.framesCounter)
+        if(this.bonus != undefined) this.bonus.draw()
         this.bubbles.forEach(elm => elm.draw())
+        this.drawScore()
     },
 
     moveAll () {
+        if(this.bonus != undefined)this.bonus.move()
         this.bubbles.forEach(elm => elm.move())
         if (this.player._bullets[0] != undefined) {this.player._bullets[0].move()}
     },
@@ -80,6 +92,7 @@ const Game = {
                 elm._posY + elm._height >= this.player._bullets[0]._posY
         )
             {
+            this.score += 200
             this.a = this.bubbles[idx]._posY - this.bubbles[idx]._height
             this.bubbles.splice(idx,1)
             this.bubble = new Bubble(this.ctx, "florAzul.png", 70, this.player._bullets[0]._posX, this.a)
@@ -107,6 +120,7 @@ const Game = {
                 this.url = "bubble.png"
                 this.url1 = this.url
             }
+            this.score += 100
             this.a = this.bubbles[idx]._posY - this.bubbles[idx]._height
             this.bubbles.splice(idx,1)
             this.bubble = new Bubble(this.ctx, this.url1, 40, this.player._bullets[0]._posX, this.a)
@@ -125,6 +139,7 @@ const Game = {
             &&
             elm._posY + elm._height >= this.player._bullets[0]._posY)
             {
+                this.score += 50
                 this.bubbles.splice(idx,1)
                 this.player._bullets.splice(0,1)
             }
@@ -140,8 +155,12 @@ const Game = {
     clearAll: function(){
         this.ctx.clearRect(0, 0, this.winW, this.winH);
     },
+    drawScore: function() {             
+        this.scoreboard.update(this.score)
+    },
     gameOver() {
-        if (this.isCollision()) {
+        if (this.isCollision()||this.score == 0) {
+            this.player._lives--
             clearInterval(this.interval)
             console.log("GAME OVER!")
         }
@@ -160,5 +179,22 @@ const Game = {
                 clearInterval(this.interval)
             }
         }
+    },
+
+    newBonus: function () {
+        if(this.framesCounter%500 == 0){
+            this.bonus = (new Bonus(this.ctx, "bubble.png"))
+        }
+    },
+
+    getBonus: function() {
+        if (this.bonus != undefined){
+            if (this.player._posX + this.player._width >= this.bonus._posX &&
+                this.player._posX < this.bonus._posX + this.bonus._width){
+                    this.player._lives++
+                    this.bonus = undefined
+                }
+            }
     }
+
 }
