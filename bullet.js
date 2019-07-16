@@ -1,12 +1,11 @@
 class Bullet {
-    constructor (ctx, playerX) {
+    constructor (ctx, playerX, playerW) {
         this._ctx = ctx
-        this._posX = playerX
-        this._posY0 = window.innerHeight
+        this._posX = playerX + playerW/2
+        this._posY0 = window.innerHeight - 20
         this._posY = this._posY0
-        //this._winH = undefined
         this._velY = -.001
-        this._width = 20
+        this._width = 10
     }
     draw() {
         this._ctx.strokeStyle = 'red'
@@ -19,6 +18,7 @@ class Bullet {
     move() {
         
             this._posY -= 10
+            
         
     }
 
