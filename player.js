@@ -15,7 +15,9 @@ class Player {
         this._image.framesIndex = 0
         this._framesCounter = framesCounter
         this._lives = 3
+        this._distanceScore = 1
         this.setListeners()
+        this._color = "red"
     }
 
     draw() {
@@ -26,7 +28,11 @@ class Player {
             this._image.height,
             this._posX, this._posY, 
             this._width,this._height)
-        if(this._bullets[0] != undefined) this._bullets[0].draw()
+        if(this._bullets[0] != undefined) {
+            this._bullets[0].draw() 
+        }
+        this._ctx.fillStyle = this._color
+        this._ctx.fillText("Lives player" + this._distanceScore +":  " +this._lives, 250*this._distanceScore, 50)
     }
     
 
@@ -43,15 +49,16 @@ class Player {
     goLeft() {
         if (this._posX > 0){
         this._posX -= this._velX
-        this._image.framesIndex--
-        if(this._image.framesIndex<2) {
-            this._image.framesIndex = 3
+        this._image.framesIndex++
+        if(this._image.framesIndex>3) {
+            this._image.framesIndex = 2
               }  
         }  
     }
 
     setListeners() {
-        document.onkeydown = (e) => {
+        document.addEventListener("keydown",
+        (e) => {
             if (e.keyCode === this._keys.RIGHT) {
                // this._image.framesIndex = 0
                 this.goRight()
@@ -60,11 +67,13 @@ class Player {
                 //this._image.framesIndex = 3
                 this.goLeft()
             }
-            if (e.keyCode === this._keys.b) {
+            if (e.keyCode === this._keys.SHOOT) {
                 this._bullet = new Bullet(this._ctx, this._posX, this._width)
-                this._bullets.push(this._bullet)
+                if(this._bullets.length == 0)
+                {this._bullets.push(this._bullet)}
             }
-        }
+        })
+        // document.onkeydown = 
         document.onkeyup = (e) => {
             if (e.keyCode === this._keys.RIGHT) {
                 this._image.framesIndex = 5 //esto lo tengo que modificar cuando tenga la imagen bien
