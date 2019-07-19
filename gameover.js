@@ -1,4 +1,4 @@
-class GameOver {
+class Result {
     constructor(ctx, url){
         this._ctx = ctx
         this._image = new Image
