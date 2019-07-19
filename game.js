@@ -33,7 +33,8 @@ const Game = {
         this.canvas.height = this.winH
     },
     start: function () {
-        document.getElementById("BlackDog").play()
+        this.song = document.getElementById("BlackDog")
+        this.song.play()
         this.bubbles = []
         this.components()
         this.scoreboard = ScoreBoard
@@ -59,7 +60,7 @@ const Game = {
 
     components: function () {
         if(this.level == 1){
-        this.background = new Background(this.ctx, "fondoPlanets.png")
+        this.background = new Background(this.ctx, "fondoNegro.jpeg")
         this.players.push(new Player(this.ctx, "louAttacks2.png", this.keys))
         this.insertBubbles()
         if (this.numPlayers == 2)
@@ -103,6 +104,9 @@ const Game = {
             this.bubbles.push(this.bubble)
         }
         if(this.level == 4) {
+            this.song.pause()
+            this.song = document.getElementById("Gorillaz")
+            this.song.play()
             this.bubble = new Bubble(this.ctx, "german.png", 200, 300,30)
             this.bubbles.push(this.bubble)
         }
@@ -118,16 +122,17 @@ const Game = {
         if(this.bulletStatic != undefined) this.bulletStatic.draw()
         this.bubbles.forEach(elm => elm.draw())
         if(this.players.length == 0) {   
-            this.result = new Result(this.ctx, "nereoCaca.png")            
+            this.result = new Result(this.ctx, "nereoCaca.png", this.winW, 400)            
             this.result.draw()
             this.bubbles = []
-            document.getElementById("BlackDog").pause()
+            this.song.pause()
             //clearInterval(this.interval)
         }
         else if(this.level == 5 && this.bubbles.length==0){
-            this.result = new Result(this.ctx, "planetBlanco.png")
+            this.result = new Result(this.ctx, "abrazo.svg", this.winW, 300)
             this.result.draw()
-            document.getElementById("BlackDog").pause()
+            this.bubbles = []
+            this.song.pause()
             //clearInterval(this.interval)
         } 
         this.drawScore()
@@ -157,14 +162,15 @@ const Game = {
 
     newBubble (i) {
         return this.bubbles.some((elm,idx) =>{
-            if ((this.players[i]._bullets[0] != undefined && elm._height > 170 &&
+            if (this.players[i]._bullets[0] != undefined && elm._height > 170 &&
                 elm._posX + elm._width >= this.players[i]._bullets[0]._posX
                     &&
                     elm._posX <= this.players[i]._bullets[0]._posX + this.players[i]._bullets[0]._width
                     &&
-                    elm._posY + elm._height >= this.players[i]._bullets[0]._posY) || elm._posY < 0
-            )
+                    elm._posY + elm._height >= this.players[i]._bullets[0]._posY) 
+            
                 {
+                console.log(elm._posY)
                 this.score += 300
                 this.a = this.bubbles[idx]._posY - this.bubbles[idx]._height
                 this.bubbles.splice(idx,1)
@@ -179,14 +185,14 @@ const Game = {
                 this.players[i]._bullets.splice(0,1)
                 if(this.players[i]._static == 1)this.players[i]._static = 0
             }
-            
-        if ((this.players[i]._bullets[0] != undefined && elm._height > 100 &&
+
+        if (this.players[i]._bullets[0] != undefined && elm._height > 100 &&
             elm._posX + elm._width >= this.players[i]._bullets[0]._posX
                 &&
                 elm._posX <= this.players[i]._bullets[0]._posX + this.players[i]._bullets[0]._width
                 &&
-                elm._posY + elm._height >= this.players[i]._bullets[0]._posY) || elm._posY < 0
-        )
+                elm._posY + elm._height >= this.players[i]._bullets[0]._posY)
+    
             {
             this.score += 200
             this.a = this.bubbles[idx]._posY - this.bubbles[idx]._height
@@ -215,12 +221,13 @@ const Game = {
             this.players[i]._bullets.splice(0,1)
             if(this.players[i]._static == 1)this.players[i]._static = 0
         }
-        if ((this.players[i]._bullets[0] != undefined && elm._height > 50 &&
+    
+        if (this.players[i]._bullets[0] != undefined && elm._height > 50 &&
             elm._posX + elm._width >= this.players[i]._bullets[0]._posX
                 &&
                 elm._posX <= this.players[i]._bullets[0]._posX + this.players[i]._bullets[0]._width
                 &&
-                elm._posY + elm._height >= this.players[i]._bullets[0]._posY) || elm._posY < 0
+                elm._posY + elm._height >= this.players[i]._bullets[0]._posY
         )
             {
             if(this.level == 1){
@@ -254,12 +261,12 @@ const Game = {
             this.players[i]._bullets.splice(0,1)
             if(this.players[i]._static == 1)this.players[i]._static = 0
         }
-        if((this.players[i]._bullets[0] != undefined && elm._height <= 50 &&
+        if(this.players[i]._bullets[0] != undefined && elm._height <= 50 &&
             elm._posX + elm._width >= this.players[i]._bullets[0]._posX
             &&
             elm._posX <= this.players[i]._bullets[0]._posX + this.players[i]._bullets[0]._width
             &&
-            elm._posY + elm._height >= this.players[i]._bullets[0]._posY) || elm._posY < 0)
+            elm._posY + elm._height >= this.players[i]._bullets[0]._posY) 
             {
                 this.score += 50
                 this.bubbles.splice(idx,1)
@@ -321,7 +328,7 @@ const Game = {
         for(let i = 0; i < this.players.length; i++){
             if (this.bonus != undefined){
                 if (this.players[i]._posX + this.players[i]._width >= this.bonus._posX &&
-                    this.players[i]._posX < this.bonus._posX + this.bonus._width)
+                    this.players[i]._posX < this.bonus._posX + this.bonus._width && this.bonus._posY > this.winH - this.players[i]._height)
                     {
                     this.players[i]._lives++
                     this.bonus = undefined
@@ -329,7 +336,7 @@ const Game = {
             }
             if (this.bulletStatic != undefined){
                 if (this.players[i]._posX + this.players[i]._width >= this.bulletStatic._posX &&
-                    this.players[i]._posX < this.bulletStatic._posX + this.bulletStatic._width)
+                    this.players[i]._posX < this.bulletStatic._posX + this.bulletStatic._width && this.bulletStatic._posY > this.winH - this.players[i]._height)
                     {
                     this.players[i]._static = 1
                     this.bulletStatic = undefined
